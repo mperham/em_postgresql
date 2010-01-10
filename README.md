@@ -16,11 +16,16 @@ Tested with these version, other versions might work.  YMMV.
 You CANNOT have the **pg** gem installed.  ActiveRecord prefers the **pg** gem but this code requires
 the **postgres-pr** gem to be loaded.  I'm not sure if there is a way to make them live together in harmony.
 
+You'll need to ensure your code is running within an active Fiber.  The following code is a good place to start to figure out how to do this:
+
+<http://github.com/espace/neverblock/blob/master/lib/never_block/servers/thin.rb>
+
 Usage
 =======
 
 List this gem in your `config/environment.rb`:
 
+    config.gem 'postgres-pr', :lib => false
     config.gem 'em_postgresql', :lib => false
 
 and update your `config/database.yml` to contain the proper adapter attribute:
