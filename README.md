@@ -16,7 +16,7 @@ Tested with these version, other versions might work.  YMMV.
 You CANNOT have the **pg** gem installed.  ActiveRecord prefers the **pg** gem but this code requires
 the **postgres-pr** gem to be loaded.  I'm not sure if there is a way to make them live together in harmony.
 
-You'll need to ensure your code is running within an active Fiber.  The following code is a good place to start to figure out how to do this:
+You'll need to ensure your code is running within an active Fiber.  If you are running Rails in Thin, the following code is a good place to start to figure out how to do this:
 
 <http://github.com/espace/neverblock/blob/master/lib/never_block/servers/thin.rb>
 
