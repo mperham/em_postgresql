@@ -16,6 +16,17 @@ Tested with these version, other versions might work.  YMMV.
 You CANNOT have the **pg** gem installed.  ActiveRecord prefers the **pg** gem but this code requires
 the **postgres-pr** gem to be loaded.  I'm not sure if there is a way to make them live together in harmony.
 
+Usage
+=======
+
+List this gem in your `config/environment.rb`:
+
+    config.gem 'em_postgresql', :lib => false
+
+and update your `config/database.yml` to contain the proper adapter attribute:
+
+    adapter: em_postgresql
+
 
 Author
 =========
