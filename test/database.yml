@@ -1,0 +1,10 @@
+test:
+  adapter: em_postgresql
+  host: localhost
+  username: mike
+  password: password
+  database: onespot_test
+  schema_search_path: bdu,public
+  statement_timeout: 60
+  encoding: UTF8
+  port: 5432
