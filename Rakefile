@@ -19,6 +19,11 @@ rescue LoadError
 end
 
 
+task :gin => [:gemspec, :build] do
+	puts `gem install pkg/em_postgresql-#{File.read('VERSION').strip}.gem`
+end
+
+
 # Rake::TestTask.new do |t|
 #   t.warning = true
 # end

@@ -6,7 +6,6 @@ require 'fiber'
 module EventMachine
   module Protocols
     class Postgres3
-      # TODO Support various methods on PGconn used by AR.
       def exec(sql)
         fiber = Fiber.current
         query(sql).callback do |status, result, errors|
@@ -14,7 +13,7 @@ module EventMachine
         end
         (status, result, errors) = Fiber.yield
         return PGresult.new(result) if status
-        raise RuntimeError, errors.inspect
+        raise RuntimeError, (errors || result).inspect
       end
     end
   end
@@ -41,11 +40,12 @@ module ActiveRecord
         @connection = ::EM.connect(@hostname, @port, ::EM::P::Postgres3)
         
         fiber = Fiber.current
-        @connection.connect(*@connect_parameters).callback do |result|
-          fiber.resume(result)
+        @connection.connect(*@connect_parameters).callback do |result, msg|
+          fiber.resume([result, msg])
         end
         
-        raise RuntimeError, "Connection failed" if !Fiber.yield
+        (status, msg) = Fiber.yield
+        raise RuntimeError, "Connection failed: #{msg}" if !status
         
         # Use escape string syntax if available. We cannot do this lazily when encountering
         # the first string, because that could then break any transactions in progress.
@@ -76,7 +76,6 @@ module ActiveRecord
       end
       
       def active?
-        # We're asking the driver, not ActiveRecord, so use @connection.query instead of #query
         @connection.exec 'SELECT 1'
         true
       rescue RuntimeError
