@@ -1,6 +1,13 @@
 module ActiveRecord
   module ConnectionAdapters
     
+    def self.fiber_pools
+      @fiber_pools ||= []
+    end
+    def self.register_fiber_pool(fp)
+      fiber_pools << fp
+    end
+
     class FiberedMonitor
       class Queue
         def initialize
@@ -70,9 +77,10 @@ module ActiveRecord
       def remove_stale_cached_threads!(cache, &block)
         keys = Set.new(cache.keys)
 
-        f = EmPostgreSQLAdapter::FIBERS
-        f.busy_fibers.each_pair do |object_id, fiber|
-          keys.delete(object_id)
+        ActiveRecord::ConnectionAdapters.fiber_pools.each do |pool|
+          pool.busy_fibers.each_pair do |object_id, fiber|
+            keys.delete(object_id)
+          end
         end
 #        puts "Pruning stale connections: #{f.busy_fibers.size} #{f.fibers.size} #{keys.inspect}"
         keys.each do |key|

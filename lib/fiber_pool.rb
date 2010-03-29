@@ -32,17 +32,25 @@ class FiberPool
   attr_reader :fibers
   attr_reader :busy_fibers
 
+  # Code can register a proc with this FiberPool to be called
+  # every time a Fiber is finished.  Good for releasing resources
+  # like ActiveRecord database connections.
+  attr_accessor :generic_callbacks
+
   # Prepare a list of fibers that are able to run different blocks of code
   # every time. Once a fiber is done with its block, it attempts to fetch
   # another one from the queue
   def initialize(count = 100)
-    @fibers,@busy_fibers,@queue = [],{},[]
+    @fibers,@busy_fibers,@queue,@generic_callbacks = [],{},[],[]
     count.times do |i|
       fiber = Fiber.new do |block|
         loop do
           block.call
           # callbacks are called in a reverse order, much like c++ destructor
           Fiber.current[:callbacks].pop.call while Fiber.current[:callbacks].length > 0
+          generic_callbacks.each do |cb|
+            cb.call
+          end
           unless @queue.empty?
             block = @queue.shift
           else
