@@ -6,8 +6,8 @@ An EventMachine-aware driver for using Postgresql with ActiveRecord.
 Requirements
 ==============
 
-* Ruby 1.9! (or Ruby 1.8 with the Fiber extension)
-* EventMachine 0.10.12
+* Ruby 1.9
+* EventMachine 0.12.10
 * postgres-pr 0.6.1
 * Rails 2.3.5
 

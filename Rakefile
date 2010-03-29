@@ -12,6 +12,8 @@ begin
     s.authors = ['Mike Perham']
     s.files = FileList["[A-Z]*", "{lib,test}/**/*"]
     s.test_files = FileList["test/test_*.rb"]
+    s.add_dependency 'postgres-pr', '>=0.6.1'
+    s.add_dependency 'eventmachine', '>=0.12.10'
   end
 
 rescue LoadError
