@@ -197,6 +197,7 @@ module EventMachine
           @e << msg.field_data[2]
         when NoticeResponse
           @notice_processor.call(msg) if @notice_processor
+        when ParameterStatus
         else
           # TODO
           puts "Unknown Postgres message: #{msg}"
