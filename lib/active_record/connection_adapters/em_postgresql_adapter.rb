@@ -1,72 +1,8 @@
+require 'postgres_connection'
+
 require 'active_record'
 require 'active_record/connection_adapters/postgresql_adapter'
 require 'active_record/patches'
-
-require 'fiber'
-
-module EventMachine
-  module Protocols
-    class Postgres3
-
-      def exec(sql)
-        fiber = Fiber.current
-#        p [fiber.object_id, self.object_id, sql]
-        yielding = true
-        (status, result, errors) = nil
-        query(sql).callback do |s, r, e|
-          (status, result, errors) = s, r, e
-          fiber.resume if Fiber.current != fiber
-          yielding = false
-        end
-        Fiber.yield if yielding
-#        p [fiber.object_id, self.object_id, result]
-        return PGresult.new(result) if status
-        raise RuntimeError, errors || result
-      end
-
-      def close
-        close_connection
-      end
-
-      def closed?
-        defined? @connected
-      end
-
-      def unbind
-        if o = (@pending_query || @pending_conn)
-          o.succeed false, "lost connection"
-        end
-        @connected = false
-      end
-
-      def dispatch_query_message msg
-        case msg
-        when DataRow
-          @r.rows << msg.columns
-        when CommandComplete
-          @r.cmd_tag = msg.cmd_tag
-        when ReadyForQuery
-          pq,@pending_query = @pending_query,nil
-          pq.succeed @e.size == 0, @r, @e
-        when RowDescription
-          @r.fields = msg.fields
-        when CopyInResponse
-        when CopyOutResponse
-        when EmptyQueryResponse
-        when ErrorResponse
-          @e << msg.field_values[2]
-        when NoticeResponse
-          @notice_processor.call(msg) if @notice_processor
-        when ParameterStatus
-        else
-          # TODO
-          raise "Unhandled Postgres message: #{msg.inspect}"
-        end
-      end
-
-    end
-  end
-end
 
 if !PGconn.respond_to?(:quote_ident)
   def PGconn.quote_ident(name)
@@ -97,20 +33,26 @@ module ActiveRecord
       
       def connect
         @logger.info "Connecting to #{@hostname}:#{@port}"
-        @connection = ::EM.connect(@hostname, @port, ::EM::P::Postgres3)
+        @connection = ::EM.connect(@hostname, @port, ::EM::P::PostgresConnection)
 
         fiber = Fiber.current
         yielding = true
-        task = @connection.connect(*@connect_parameters)
         result = false
-        task.callback do |rc|
+        message = nil
+        task = @connection.connect(*@connect_parameters)
+        task.callback do |rc, msg|
           result = rc
-          fiber.resume if Fiber.current != fiber
+          message = msg
+          fiber.resume
+        end
+        task.errback do |msg|
+          result = false
+          message = msg
           yielding = false
         end
         Fiber.yield if yielding
 
-        raise RuntimeError, "Connection failed: #{result.inspect}" if !result
+        raise RuntimeError, "Connection failed: #{message}" if !result
         
         # Use escape string syntax if available. We cannot do this lazily when encountering
         # the first string, because that could then break any transactions in progress.

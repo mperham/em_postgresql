@@ -25,21 +25,21 @@ EM.run do
 
     include Test::Unit::Assertions
 
-    class Account < ActiveRecord::Base
-      set_table_name 'account'
+    class Site < ActiveRecord::Base
+      set_table_name 'site'
     end
 
     ActiveRecord::Base.establish_connection
 
-    result = ActiveRecord::Base.connection.query('select id, domain_name from account')
+    result = ActiveRecord::Base.connection.query('select id, domain_name from site')
     assert result
     assert_equal 3, result.size
 
-    result = Account.all
+    result = Site.all
     assert result
     assert_equal 3, result.size
 
-    result = Account.find(1)
+    result = Site.find(1)
     assert_equal 1, result.id
     assert_equal 'somedomain.com', result.domain_name
   end.resume
