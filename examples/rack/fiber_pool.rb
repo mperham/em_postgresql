@@ -1,11 +1,10 @@
 require 'fiber_pool'
 
 module Rack
-  # Runs each request in a Fiber.  Optionally can limit the
-  # Fibers to a given pool.
+  # Run each request in a Fiber.  This FiberPool is
+  # provided by em_postgresql.  Should probably split
+  # this dependency out.
   class FiberPool
-    VERSION = '0.8.0'
-    
     def initialize(app)
       @app = app
       @fiber_pool = ::FiberPool.new
