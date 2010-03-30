@@ -1,3 +1,4 @@
+require 'eventmachine'
 require 'postgres-pr/message'
 require 'postgres-pr/connection'
 require 'stringio'
