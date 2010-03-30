@@ -195,7 +195,7 @@ module EventMachine
         when CopyOutResponse
         when EmptyQueryResponse
         when ErrorResponse
-          @e << msg.field_data[2]
+          @e << msg.field_values[2]
         when NoticeResponse
           @notice_processor.call(msg) if @notice_processor
         when ParameterStatus
