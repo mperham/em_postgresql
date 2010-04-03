@@ -188,7 +188,7 @@ module EventMachine
           @r.cmd_tag = msg.cmd_tag
         when ReadyForQuery
           pq,@pending_query = @pending_query,nil
-          pq.succeed true, @r, @e
+          pq.succeed @e.size == 0, @r, @e
         when RowDescription
           @r.fields = msg.fields
         when CopyInResponse

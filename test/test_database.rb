@@ -19,33 +19,33 @@ Time.zone = 'UTC'
 require 'eventmachine'
 require 'test/unit'
 
-EM.run do
-  
-  Fiber.new do
+class Site < ActiveRecord::Base
+  set_table_name 'site'
+end
 
-    include Test::Unit::Assertions
+class TestDatabase < Test::Unit::TestCase
+  def test_live_server
+    EM.run do
+      Fiber.new do
+        ActiveRecord::Base.establish_connection
 
-    class Site < ActiveRecord::Base
-      set_table_name 'site'
+        result = ActiveRecord::Base.connection.query('select id, domain_name from site')
+        assert result
+        assert_equal 3, result.size
+
+        result = Site.all
+        assert result
+        assert_equal 3, result.size
+
+        result = Site.find(1)
+        assert_equal 1, result.id
+        assert_equal 'somedomain.com', result.domain_name
+      end.resume
+
+      EM.add_timer(1) do
+        EM.stop
+      end
+
     end
-
-    ActiveRecord::Base.establish_connection
-
-    result = ActiveRecord::Base.connection.query('select id, domain_name from site')
-    assert result
-    assert_equal 3, result.size
-
-    result = Site.all
-    assert result
-    assert_equal 3, result.size
-
-    result = Site.find(1)
-    assert_equal 1, result.id
-    assert_equal 'somedomain.com', result.domain_name
-  end.resume
-
-  EM.add_timer(1) do
-    EM.stop
   end
-
 end

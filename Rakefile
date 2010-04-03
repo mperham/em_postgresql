@@ -1,6 +1,6 @@
 # vim: syntax=Ruby
 require 'rubygems'
-# require 'rake/testtask'
+require 'rake/testtask'
 
 begin
   require 'jeweler'
@@ -26,15 +26,6 @@ task :gin => [:gemspec, :build] do
 end
 
 
-# Rake::TestTask.new do |t|
-#   t.warning = true
-# end
-
-# TODO Figure out how to integrate EM with test/unit.
-task :test do
-  $LOAD_PATH << File.expand_path('lib')
-  $LOAD_PATH << File.expand_path('test')
-  require 'test_database'
-end
+Rake::TestTask.new
 
 task :default => :test
