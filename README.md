@@ -8,7 +8,7 @@ Requirements
 
 * Ruby 1.9
 * EventMachine 0.12.10
-* postgres-pr 0.6.1
+* postgres-pr 0.6.3
 * Rails 2.3.5
 
 Tested with these version, other versions might work.  YMMV.

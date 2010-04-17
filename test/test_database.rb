@@ -3,7 +3,7 @@ require 'logger'
 require 'yaml'
 require 'erb'
 
-gem 'activerecord', '>= 2.3.5'
+gem 'activerecord', '2.3.5'
 require 'active_record'
 
 RAILS_ENV='test'
@@ -47,5 +47,21 @@ class TestDatabase < Test::Unit::TestCase
       end
 
     end
+  end
+  
+  def test_without_em
+    ActiveRecord::Base.establish_connection
+
+    result = ActiveRecord::Base.connection.query('select id, domain_name from site')
+    assert result
+    assert_equal 3, result.size
+
+    result = Site.all
+    assert result
+    assert_equal 3, result.size
+
+    result = Site.find(1)
+    assert_equal 1, result.id
+    assert_equal 'somedomain.com', result.domain_name 
   end
 end

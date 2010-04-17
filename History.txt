@@ -1,0 +1,8 @@
+v0.4.0
+
+ * Support using driver in blocking mode, in order to support environments like
+   rake where there is no EM reactor running.
+
+v0.3.0
+
+ * ActiveRecord patches for fiber-safe connection pooling.
