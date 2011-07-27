@@ -22,9 +22,7 @@ module ActiveRecord
             fiber.resume(false)
           end
           @queue << fiber
-          returning Fiber.yield do
-            x.cancel
-          end
+          Fiber.yield.tap{ x.cancel }
         end
 
         def signal
