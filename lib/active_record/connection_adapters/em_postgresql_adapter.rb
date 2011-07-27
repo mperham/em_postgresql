@@ -60,7 +60,7 @@ module ActiveRecord
           # See: http://www.postgresql.org/docs/current/static/runtime-config-compatible.html
           # If PostgreSQL doesn't know the standard_conforming_strings parameter then it doesn't
           # support escape string syntax. Don't override the inherited quoted_string_prefix.
-          if supports_standard_conforming_strings?
+          if respond_to?(:supports_standard_conforming_strings?) and supports_standard_conforming_strings?
             self.class.instance_eval do
               define_method(:quoted_string_prefix) { 'E' }
             end
