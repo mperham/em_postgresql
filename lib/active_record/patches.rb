@@ -75,6 +75,8 @@ module ActiveRecord
 
       # Remove stale fibers from the cache.
       def remove_stale_cached_threads!(cache, &block)
+        return if ActiveRecord::ConnectionAdapters.fiber_pools.empty?
+
         keys = Set.new(cache.keys)
 
         ActiveRecord::ConnectionAdapters.fiber_pools.each do |pool|
