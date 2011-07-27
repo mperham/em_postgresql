@@ -1,8 +1,8 @@
 # This program demonstrates that the connection pool actual works, as does the wait_timeout option.
 # You need to provide your own configuration to #establish_connection.
 
-gem "postgres-pr"
-gem "em_postgresql"
+$LOAD_PATH << File.dirname(__FILE__) + '/../lib'
+
 require "eventmachine"
 require "fiber"
 require "active_record"
@@ -14,7 +14,7 @@ ActiveRecord::Base.establish_connection :adapter      => "em_postgresql",
                                         :pool         => 2,
                                         :username     => "cjbottaro",
                                         :host         => "localhost",
-                                        :database     => "test",
+                                        :database     => "editor-ui_development",
                                         :wait_timeout => 2
 
 EM.run do
